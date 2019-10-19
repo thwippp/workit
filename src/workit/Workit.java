@@ -5,6 +5,10 @@
  */
 package workit;
 
+import Model.DBConnection;
+import Model.MYSQL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -20,7 +24,7 @@ import javafx.stage.Stage;
 public class Workit extends Application {
     
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage primaryStage) throws Exception {
         Button btn = new Button();
         btn.setText("Say 'Hello World'");
         btn.setOnAction(new EventHandler<ActionEvent>() {
@@ -39,6 +43,9 @@ public class Workit extends Application {
         primaryStage.setTitle("Hello World!");
         primaryStage.setScene(scene);
         primaryStage.show();
+        
+        MYSQL testQuery = new MYSQL();
+        testQuery.query("Select * from task;");
     }
 
     /**
