@@ -11,28 +11,28 @@ public class Task {
     private String name;
     private String description;
     private Date dueDate;
-    private double severity;
     private double scope;
+    private double severity;
     private double priority;
     private int userId;
 
-    public Task(int id, String name, String description, Date dueDate, double severity, double scope, double priority, int userId) {
+    public Task(int id, String name, String description, Date dueDate, double scope, double severity, double priority, int userId) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.dueDate = dueDate;
-        this.severity = severity;
         this.scope = scope;
+        this.severity = severity;
         this.priority = priority;
         this.userId = userId;
     }
 
-    public Task(String name, String description, Date dueDate, double severity, double scope) {
+    public Task(String name, String description, Date dueDate, double scope, double severity) {
         this.name = name;
         this.description = description;
         this.dueDate = dueDate;
-        this.severity = severity;
         this.scope = scope;
+        this.severity = severity;
     }
 
     public int getId() {
@@ -67,20 +67,20 @@ public class Task {
         this.dueDate = dueDate;
     }
 
-    public double getSeverity() {
-        return severity;
-    }
-
-    public void setSeverity(double severity) {
-        this.severity = severity;
-    }
-
     public double getScope() {
         return scope;
     }
 
     public void setScope(double scope) {
         this.scope = scope;
+    }
+    
+    public double getSeverity() {
+        return severity;
+    }
+
+    public void setSeverity(double severity) {
+        this.severity = severity;
     }
 
     public double getPriority() {
@@ -101,7 +101,7 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Task{" + "id=" + id + ", name=" + name + ", description=" + description + ", dueDate=" + dueDate + ", severity=" + severity + ", scope=" + scope + ", priority=" + priority + ", userId=" + userId + '}';
+        return "Task{" + "id=" + id + ", name=" + name + ", description=" + description + ", dueDate=" + dueDate + ", scope=" + scope + ", severity=" + severity  + ", priority=" + priority + ", userId=" + userId + '}';
     }
     
 }

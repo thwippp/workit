@@ -26,7 +26,7 @@ and open the template in the editor.
 .button {
     -fx-font: 12px "Roboto", "sans-serif";
     -fx-font-weight: bold;
-    -fx-text-fill: light-primary-color;
+    -fx-text-fill: primary-text-color;
     -fx-background-color: accent-color;
     -fx-border-color: dark-primary-color;
     -fx-border-width: 2px;
@@ -50,6 +50,23 @@ and open the template in the editor.
 }
 
 .text-field:focused{
+    -fx-border-color: accent-color;
+}
+
+.text-area{
+    -fx-font: 10px "Roboto", "sans-serif";
+    -fx-font-weight: bold;
+    -fx-text-fill: primary-text-color;
+    -fx-border-width: 2px;
+    -fx-border-color: transparent;
+    -fx-accent: accent-color;
+}
+
+.text-area:focused{
+    -fx-border-color: accent-color;
+}
+
+.choice-box:focused{
     -fx-border-color: accent-color;
 }
 

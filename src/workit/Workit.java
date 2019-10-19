@@ -12,8 +12,11 @@ import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
@@ -24,28 +27,15 @@ import javafx.stage.Stage;
 public class Workit extends Application {
     
     @Override
-    public void start(Stage primaryStage) throws Exception {
-        Button btn = new Button();
-        btn.setText("Say 'Hello World'");
-        btn.setOnAction(new EventHandler<ActionEvent>() {
-            
-            @Override
-            public void handle(ActionEvent event) {
-                System.out.println("Hello World!");
-            }
-        });
+    public void start(Stage stage) throws Exception {
         
-        StackPane root = new StackPane();
-        root.getChildren().add(btn);
-        
-        Scene scene = new Scene(root, 300, 250);
-        
-        primaryStage.setTitle("Hello World!");
-        primaryStage.setScene(scene);
-        primaryStage.show();
-        
-        MYSQL testQuery = new MYSQL();
-        testQuery.query("Select * from task;");
+        Parent root = FXMLLoader.load(getClass().getResource("/View_Controller/Login.fxml"));
+        Scene scene = new Scene(root);
+        stage.setScene(scene);
+        stage.show();
+
+        stage.setTitle("WORK IT System || Brian Schaffeld || ID# 000790777");
+        stage.getIcons().add(new Image("/Model/listChecks64.png"));
     }
 
     /**
