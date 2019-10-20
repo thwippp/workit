@@ -75,7 +75,6 @@ public class UserController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
 
-        // TODO-- toLowerCase?... Do I really need it?
         try {
             // Gets next auto increment value for adding another user
             getAIForUser();
@@ -92,10 +91,10 @@ public class UserController implements Initializable {
     private void addButtonAction(ActionEvent event) throws Exception {
 
         int id = Integer.parseInt(userIdTextField.getText().trim());
-        String first = firstNameTextField.getText().trim().toLowerCase();
-        String last = lastNameTextField.getText().trim().toLowerCase();
-        String username = usernameTextField.getText().trim().toLowerCase();
-        String email = emailTextField.getText().trim().toLowerCase();
+        String first = firstNameTextField.getText().trim();
+        String last = lastNameTextField.getText().trim();
+        String username = usernameTextField.getText().trim();
+        String email = emailTextField.getText().trim();
 
         try {
             System.out.println("Starting Insert...");
@@ -116,6 +115,9 @@ public class UserController implements Initializable {
             System.out.println(ex);
         }
 
+        // Clears intake form
+        clearForm();
+
         // Rebuilt TableView
         clearAndRebuildTableView(false);
 
@@ -127,10 +129,10 @@ public class UserController implements Initializable {
     @FXML
     private void updateButtonAction(ActionEvent event) throws Exception {
         int id = Integer.parseInt(userIdTextField.getText().trim());
-        String first = firstNameTextField.getText().trim().toLowerCase();
-        String last = lastNameTextField.getText().trim().toLowerCase();
-        String username = usernameTextField.getText().trim().toLowerCase();
-        String email = emailTextField.getText().trim().toLowerCase();
+        String first = firstNameTextField.getText().trim();
+        String last = lastNameTextField.getText().trim();
+        String username = usernameTextField.getText().trim();
+        String email = emailTextField.getText().trim();
 
         try {
             System.out.println("Starting Update...");
@@ -151,6 +153,9 @@ public class UserController implements Initializable {
         } catch (SQLException ex) {
             System.out.println(ex);
         }
+
+        // Clears intake form
+        clearForm();
 
         // Rebuilt TableView
         clearAndRebuildTableView(false);

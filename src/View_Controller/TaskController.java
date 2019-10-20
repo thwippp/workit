@@ -4,8 +4,11 @@ import Model.DBConnection;
 import Model.MYSQL;
 import Model.Master;
 import Model.Task;
-import Model.User;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,15 +17,14 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 import java.util.ResourceBundle;
-import javafx.beans.InvalidationListener;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -41,6 +43,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
+import javax.swing.filechooser.FileSystemView;
 
 /**
  * FXML Controller class
@@ -78,7 +81,11 @@ public class TaskController implements Initializable {
     @FXML
     private Button cancelButton;
     @FXML
-    private Button reportButton;
+    private ChoiceBox<String> sortExportByChoiceBox;
+    @FXML
+    private Button reportTxtButton;
+    @FXML
+    private Button reportCsvButton;
     @FXML
     private TableView<Task> taskTableView;
     @FXML
@@ -114,6 +121,9 @@ public class TaskController implements Initializable {
         // Severity
         severityChoiceBox.getItems().addAll(1.0, 2.0, 3.0);
 
+        // SortExportByChoiceBox
+        sortExportByChoiceBox.getItems().addAll("Id", "Name", "Description", "Due Date", "Scope", "Severity", "Priority", "User Id", "Username");
+
         // Username
         // Get all users from user table
         ObservableList<ArrayList> result = null;
@@ -144,9 +154,34 @@ public class TaskController implements Initializable {
         usernameChoiceBox.getSelectionModel().selectedItemProperty()
                 .addListener((obs, oldV, newV) -> {
                     getUserIdFromUsername(newV);
-                    System.out.println("changed: " + newV);
+                    System.out.println("Username changed: " + newV);
                 }
                 );
+
+        // TODO-- add dueDate as a + 1 (justifies using double)
+        // TODO-- change 1, 2, 3 to High, Mediumn, Low and Narrow, Pattern, Widespread
+        scopeChoiceBox.getSelectionModel().selectedItemProperty()
+                .addListener((obs, oldV, newV) -> {
+                    try {
+                        priorityTextField.setText(String.valueOf(setPriority(scopeChoiceBox.getValue(), severityChoiceBox.getValue())));
+                    } catch (Exception e) {
+//                        priorityTextField.setText(null);
+                    }
+                    System.out.println("Scope changed: " + newV);
+                }
+                );
+
+        severityChoiceBox.getSelectionModel().selectedItemProperty()
+                .addListener((obs, oldV, newV) -> {
+                    try {
+                        priorityTextField.setText(String.valueOf(setPriority(scopeChoiceBox.getValue(), severityChoiceBox.getValue())));
+                    } catch (Exception e) {
+//                        priorityTextField.setText(null);
+                    }
+                    System.out.println("Severity changed: " + newV);
+                }
+                );
+//        setPriority(scopeChoiceBox.getValue(),severityChoiceBox.getValue());
     }
 
     private void getUserIdFromUsername(String username) {
@@ -158,7 +193,8 @@ public class TaskController implements Initializable {
 
             for (int r = 0; r < result.size(); r++) {
                 // Add each item to the usernameChoiceBox
-                userIdTextField.setText(String.valueOf(result.get(r).get(0)));
+                String uid = String.valueOf(result.get(r).get(0));
+                userIdTextField.setText(uid);
             }
 
             System.out.println(result);
@@ -204,6 +240,9 @@ public class TaskController implements Initializable {
             System.out.println(ex);
         }
 
+        // Clears intake form
+        clearForm();
+
         // Rebuilt TableView
         clearAndRebuildTableView(false);
 
@@ -214,8 +253,8 @@ public class TaskController implements Initializable {
     @FXML
     private void updateButtonAction(ActionEvent event) throws ParseException, Exception {
         int id = Integer.parseInt(taskIdTextField.getText().trim());
-        String name = nameTextField.getText().trim().toLowerCase();
-        String description = descriptionTextArea.getText().trim().toLowerCase();
+        String name = nameTextField.getText().trim();
+        String description = descriptionTextArea.getText().trim();
         String stringDueDate = dueDateDatePicker.getValue().toString();
         DateFormat dueDateDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date dateDueDate = dueDateDateFormat.parse(stringDueDate);
@@ -224,30 +263,60 @@ public class TaskController implements Initializable {
         double scope = scopeChoiceBox.getValue();
         double severity = severityChoiceBox.getValue();
         double priority = Double.parseDouble(priorityTextField.getText().trim());
-        int uid = Integer.parseInt(userIdTextField.getText().trim());
 
-        try {
-            System.out.println("Starting Update...");
+        String sUid = userIdTextField.getText();
 
-            String q = "UPDATE task SET name = ?, description = ?, dueDate = ?, scope = ?, severity = ?, priority = ?, userId = ? WHERE id = ?;";
-            try (Connection conn = DBConnection.getConnection()) {
-                PreparedStatement ps = conn.prepareStatement(q);
+        if (sUid == null) {
+            try {
+                System.out.println("Starting Update (uid null)...");
 
-                ps.setString(1, name);
-                ps.setString(2, description);
-                ps.setDate(3, sqlDueDate);
-                ps.setDouble(4, scope);
-                ps.setDouble(5, severity);
-                ps.setDouble(6, priority);
-                ps.setInt(7, uid);
-                ps.setInt(8, id);
+                String q = "UPDATE task SET name = ?, description = ?, dueDate = ?, scope = ?, severity = ?, priority = ? WHERE id = ?;";
+                try (Connection conn = DBConnection.getConnection()) {
+                    PreparedStatement ps = conn.prepareStatement(q);
 
-                ps.execute();
+                    ps.setString(1, name);
+                    ps.setString(2, description);
+                    ps.setDate(3, sqlDueDate);
+                    ps.setDouble(4, scope);
+                    ps.setDouble(5, severity);
+                    ps.setDouble(6, priority);
+                    ps.setInt(7, id);
+
+                    ps.execute();
+                }
+
+            } catch (SQLException ex) {
+                System.out.println(ex);
             }
+        } else {
+            try {
+                System.out.println("Starting Update (uid not null)...");
 
-        } catch (SQLException ex) {
-            System.out.println(ex);
+                int uid = Integer.parseInt(userIdTextField.getText().trim());
+
+                String q = "UPDATE task SET name = ?, description = ?, dueDate = ?, scope = ?, severity = ?, priority = ?, userId = ? WHERE id = ?;";
+                try (Connection conn = DBConnection.getConnection()) {
+                    PreparedStatement ps = conn.prepareStatement(q);
+
+                    ps.setString(1, name);
+                    ps.setString(2, description);
+                    ps.setDate(3, sqlDueDate);
+                    ps.setDouble(4, scope);
+                    ps.setDouble(5, severity);
+                    ps.setDouble(6, priority);
+                    ps.setInt(7, uid);
+                    ps.setInt(8, id);
+
+                    ps.execute();
+                }
+
+            } catch (SQLException ex) {
+                System.out.println(ex);
+            }
         }
+
+        // Clears intake form
+        clearForm();
 
         // Rebuilt TableView
         clearAndRebuildTableView(false);
@@ -321,7 +390,13 @@ public class TaskController implements Initializable {
         scopeChoiceBox.setValue(selectedTask.getScope());
         severityChoiceBox.setValue(selectedTask.getSeverity());
         priorityTextField.setText(String.valueOf(selectedTask.getPriority()));
-        userIdTextField.setText(String.valueOf(selectedTask.getUserId()));
+
+        int uid = selectedTask.getUserId();
+        if (uid > 0) {
+            userIdTextField.setText(String.valueOf(uid));
+        } else {
+            userIdTextField.setText(null);
+        }
 
         TablePosition pos = taskTableView.getSelectionModel().getSelectedCells().get(0);
         int row = pos.getRow();
@@ -340,6 +415,125 @@ public class TaskController implements Initializable {
         } catch (Exception e) {
             System.out.println("Catch...");
             System.out.println(e);
+        }
+    }
+
+    @FXML
+    private void reportTxtButtonAction() throws IOException {
+        System.out.println("Starting TXT Report");
+        createReportFile("TaskExportTXT", true);
+        System.out.println("Finished TXT Report");
+    }
+
+    @FXML
+    private void reportCsvButtonAction() throws IOException {
+        System.out.println("Starting CSV Report");
+        createReportFile("TaskExportCSV", false);
+        System.out.println("Finished CSV Report");
+    }
+
+    private double setPriority(double inputScope, double inputSeverity) {
+
+        double priorityScore = Double.sum(inputScope, inputSeverity);
+
+        if (priorityScore > 5) {
+            return 1;
+        } else if (priorityScore > 4) {
+            return 2;
+        } else if (priorityScore > 3) {
+            return 3;
+        } else if (priorityScore > 2) {
+            return 4;
+        } else {
+            return 5;
+        }
+    }
+
+    private void createReportFile(String fileName, boolean isTxt) throws IOException {
+        String orderBy;
+        if (sortExportByChoiceBox.getValue() == null) {
+            orderBy = "t.id";
+        } else {
+
+            orderBy = sortExportByChoiceBox.getValue();
+            switch (orderBy) {
+                case "Id":
+                    orderBy = "t.id";
+                    break;
+                case "Name":
+                    orderBy = "username";
+                    break;
+                case "Description":
+                    orderBy = "description";
+                    break;
+                case "Due Date":
+                    orderBy = "dueDate";
+                    break;
+                case "Scope":
+                    orderBy = "scope";
+                    break;
+                case "Severity":
+                    orderBy = "severity";
+                    break;
+                case "Priority":
+                    orderBy = "priority";
+                    break;
+                case "User Id":
+                    orderBy = "t.userId";
+                    break;
+                case "Username":
+                    orderBy = "u.username";
+                    break;
+                default:
+                    orderBy = "t.id";
+            }
+        }
+
+        Writer writer = null;
+        try {
+            System.out.println("Starting File...");
+
+            FileSystemView filesys = FileSystemView.getFileSystemView();
+
+            File[] roots = filesys.getRoots();
+
+            String path = filesys.getHomeDirectory().getPath();
+
+            if (isTxt) {
+                path = path + "\\" + fileName + ".txt";
+            } else {
+                path = path + "\\" + fileName + ".csv";
+            }
+
+            File file = new File(path);
+            writer = new BufferedWriter(new FileWriter(file));
+
+            ObservableList<ArrayList> result = FXCollections.observableArrayList();
+            try {
+                System.out.println("Starting query...");
+                String sql = "SELECT t.id, name, description, dueDate, scope, severity, priority, t.userId, u.username FROM task t LEFT JOIN user u ON (t.userId = u.id) ORDER BY " + orderBy + ";";
+                result = new MYSQL().query(sql);
+
+                String headers = "Id, Name, Description, DueDate, Scope, Severity, Priority, UserId, Username" + "\n";
+                writer.write(headers);
+
+                for (int r = 0; r < result.size(); r++) {
+                    String currentLine = result.get(r).toString() + "\n";
+                    currentLine = currentLine.replace("[", "").replace("]", "");
+                    System.out.println("Writing line...");
+                    writer.write(currentLine);
+                }
+
+                System.out.println(result);
+            } catch (Exception ex) {
+                System.out.println("Error");
+            }
+
+        } catch (IOException ex) {
+            System.out.println(ex);
+        } finally {
+            writer.flush();
+            writer.close();
         }
     }
 

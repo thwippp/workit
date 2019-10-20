@@ -1,7 +1,5 @@
 package Model;
 
-import java.util.ArrayList;
-
 /**
  *
  * @author Schaffeld, B. (000790777);

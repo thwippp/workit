@@ -1,8 +1,6 @@
 package View_Controller;
 
 import Model.DBConnection;
-import Model.MYSQL;
-import com.sun.media.jfxmedia.logging.Logger;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.CallableStatement;

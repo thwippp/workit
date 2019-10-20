@@ -34,24 +34,24 @@
                                     </font>
                                 </Text>
                                 <Separator focusTraversable="false" orientation="VERTICAL" visible="false" />
-                                <HBox spacing="10.0">
+                                <HBox minWidth="300.0" spacing="10.0">
                                     <children>
-                                        <VBox spacing="5.0">
+                                        <VBox prefWidth="200.0" spacing="5.0">
                                             <children>
                                                 <Label text="Task Id" />
-                                                <TextField fx:id="taskIdTextField" alignment="CENTER" promptText="Task Id" />
+                                                <TextField fx:id="taskIdTextField" alignment="CENTER" promptText="Task Id (Read Only)" />
                                                 <Label text="Description" />
                                                 <TextArea fx:id="descriptionTextArea" prefHeight="200.0" prefWidth="200.0" promptText="Description" />
                                                 <Label text="User Id" />
-                                                <TextField fx:id="userIdTextField" alignment="CENTER" editable="false" promptText="User Id" />
+                                                <TextField fx:id="userIdTextField" alignment="CENTER" editable="false" promptText="User Id (Read Only)" />
                                                 <Label text="Username" />
                                                 <ChoiceBox fx:id="usernameChoiceBox" prefWidth="150.0" />
                                             </children>
                                         </VBox>
-                                        <VBox prefHeight="200.0" prefWidth="100.0" spacing="5.0">
+                                        <VBox prefWidth="200.0" spacing="5.0">
                                             <children>
                                                 <Label text="Name" />
-                                                <TextField fx:id="nameTextField" alignment="CENTER" promptText="Task Name" />
+                                                <TextField fx:id="nameTextField" alignment="CENTER" prefWidth="150.0" promptText="Task Name" />
                                                 <Label text="Due Date" />
                                                 <DatePicker fx:id="dueDateDatePicker" promptText="Due Date" />
                                                 <Label text="Scope" />
@@ -59,7 +59,7 @@
                                                 <Label text="Severity" />
                                                 <ChoiceBox fx:id="severityChoiceBox" prefWidth="150.0" />
                                                 <Label text="Priority" />
-                                                <TextField fx:id="priorityTextField" alignment="CENTER" promptText="Priority" />
+                                                <TextField fx:id="priorityTextField" alignment="CENTER" editable="false" promptText="Priority (Read Only)" />
                                             </children>
                                         </VBox>
                                     </children>
@@ -105,7 +105,7 @@
                         </VBox>
                         <VBox alignment="CENTER">
                             <children>
-                                <TableView fx:id="taskTableView" minWidth="450.0" onMouseReleased="#tableViewSelectionAction">
+                                <TableView fx:id="taskTableView" minWidth="300.0" onMouseReleased="#tableViewSelectionAction">
                                     <columns>
                                         <TableColumn fx:id="taskIdTableColumn" prefWidth="30.0" text="Id" />
                                         <TableColumn fx:id="nameTableColumn" prefWidth="75.0" text="Name" />
@@ -118,14 +118,24 @@
                                         <TableColumn fx:id="usernameTableColumn" prefWidth="75.0" text="Username" />
                                     </columns>
                                 </TableView>
-                                <HBox alignment="CENTER_RIGHT">
+                                <HBox alignment="CENTER_RIGHT" spacing="10.0">
                                     <children>
-                                        <Button fx:id="reportButton" alignment="CENTER_RIGHT" contentDisplay="CENTER" mnemonicParsing="false" text="Report">
+                                        <VBox alignment="CENTER">
+                                            <children>
+                                                <Label fx:id="sortExportByLabel" text="Sort Export By..." />
+                                                <ChoiceBox fx:id="sortExportByChoiceBox" prefWidth="150.0" />
+                                            </children>
+                                        </VBox>
+                                        <Button fx:id="reportTxtButton" alignment="CENTER_RIGHT" contentDisplay="CENTER" mnemonicParsing="false" onAction="#reportTxtButtonAction" text="Export .txt">
                                             <HBox.margin>
-                                                <Insets top="5.0" />
+                                                <Insets />
                                             </HBox.margin>
                                         </Button>
+                                        <Button fx:id="reportCsvButton" alignment="CENTER_RIGHT" contentDisplay="CENTER" mnemonicParsing="false" onAction="#reportCsvButtonAction" text="Export .csv" />
                                     </children>
+                                    <VBox.margin>
+                                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                    </VBox.margin>
                                 </HBox>
                             </children>
                         </VBox>
