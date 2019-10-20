@@ -23,7 +23,7 @@
                      <font>
                         <Font name="Roboto" size="30.0" />
                      </font>
-                  </Text>
+                  </Text> 
                   <Text fx:id="loginLabel" strokeType="OUTSIDE" strokeWidth="0.0" text="Log In">
                      <font>
                         <Font name="Roboto" size="30.0" />

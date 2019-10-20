@@ -1,5 +1,7 @@
 package Model;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author Schaffeld, B. (000790777);
@@ -11,6 +13,15 @@ public class User {
     private String username;
     private String email;
 
+//    public User(ArrayList<String> arrayList) {
+//        this.id = Integer.parseInt(arrayList.get(0));
+//        this.firstName = arrayList.get(1);
+//        this.lastName = arrayList.get(2);
+//        this.username = arrayList.get(3);
+//        this.email = arrayList.get(4);
+//    }
+    
+    
     public User(int id, String firstName, String lastName, String username, String email) {
         this.id = id;
         this.firstName = firstName;

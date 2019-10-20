@@ -14,7 +14,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane prefHeight="450.0" prefWidth="800.0" stylesheets="@Style.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="View_Controller.TaskController">
+<AnchorPane prefHeight="450.0" prefWidth="800.0" stylesheets="@Style.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="View_Controller.UserController">
     <children>
         <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <center>
@@ -82,10 +82,10 @@
                               <TableView fx:id="userTableView" minWidth="450.0" onMouseReleased="#tableViewSelectionAction">
                                   <columns>
                                       <TableColumn fx:id="userIdTableColumn" prefWidth="30.0" text="Id" />
-                                      <TableColumn fx:id="firstTableColumn" prefWidth="100.0" text="First" />
-                                      <TableColumn fx:id="lastTableColumn" prefWidth="50.0" text="Last" />
-                                      <TableColumn fx:id="usernameTableColumn" prefWidth="75.0" text="Username" />
-                                      <TableColumn fx:id="emailTableColumn" prefWidth="75.0" text="Email" />
+                                      <TableColumn fx:id="firstNameTableColumn" prefWidth="100.0" text="First Name" />
+                                      <TableColumn fx:id="lastNameTableColumn" prefWidth="100.0" text="Last Name" />
+                                      <TableColumn fx:id="usernameTableColumn" prefWidth="100.0" text="Username" />
+                                      <TableColumn fx:id="emailTableColumn" prefWidth="100.0" text="Email" />
                                   </columns>
                               </TableView>
                      </children>

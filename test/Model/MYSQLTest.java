@@ -19,7 +19,7 @@ public class MYSQLTest {
     public void testQuery() throws Exception {
         MYSQL m = new MYSQL();
         boolean expected = true;
-        boolean actual = m.query("select * from task limit 1;");
+        boolean actual = m.booleanQuery("select * from task limit 1;");
         assertEquals(expected, actual);
     }
     

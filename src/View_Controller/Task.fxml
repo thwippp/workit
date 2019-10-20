@@ -105,11 +105,12 @@
                         </VBox>
                   <VBox alignment="CENTER">
                      <children>
-                              <TableView fx:id="userTableView" minWidth="450.0" onMouseReleased="#tableViewSelectionAction">
+                              <TableView fx:id="taskTableView" minWidth="450.0" onMouseReleased="#tableViewSelectionAction">
                                   <columns>
                                       <TableColumn fx:id="taskIdTableColumn" prefWidth="30.0" text="Id" />
                                       <TableColumn fx:id="nameTableColumn" prefWidth="75.0" text="Name" />
                                       <TableColumn fx:id="descriptionTableColumn" prefWidth="75.0" text="Description" />
+                              <TableColumn fx:id="dueDateTableColumn" prefWidth="75.0" text="Due Date" />
                                       <TableColumn fx:id="scopeTableColumn" prefWidth="75.0" text="Scope" />
                                       <TableColumn fx:id="severityTableColumn" prefWidth="75.0" text="Severity" />
                               <TableColumn fx:id="priorityTableColumn" prefWidth="75.0" text="Priority" />
