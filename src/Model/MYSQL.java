@@ -88,7 +88,8 @@ public class MYSQL {
                                 rs.getDouble("scope"),
                                 rs.getDouble("severity"),
                                 rs.getDouble("priority"),
-                                rs.getInt("userId")
+                                rs.getInt("userId"),
+                                rs.getString("username")
                         )
                 );
 

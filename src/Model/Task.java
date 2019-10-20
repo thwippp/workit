@@ -20,18 +20,9 @@ public class Task {
     private double severity;
     private double priority;
     private int userId;
+    private String username;
 
-//    public Task(ArrayList<String> arrayList) throws ParseException{
-//        this.id = Integer.parseInt(arrayList.get(0));
-//        this.name = arrayList.get(1);
-//        this.description = arrayList.get(2);
-//        this.dueDate =  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(arrayList.get(3));
-//        this.scope = Double.parseDouble(arrayList.get(4));
-//        this.severity = Double.parseDouble(arrayList.get(5));
-//        this.priority = Double.parseDouble(arrayList.get(6));
-//        this.userId = Integer.parseInt(arrayList.get(7));
-//    }
-    public Task(int id, String name, String description, Date dueDate, double scope, double severity, double priority, int userId) {
+    public Task(int id, String name, String description, Date dueDate, double scope, double severity, double priority, int userId, String username) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -40,6 +31,7 @@ public class Task {
         this.severity = severity;
         this.priority = priority;
         this.userId = userId;
+        this.username = username;
     }
 
     public Task(String name, String description, Date dueDate, double scope, double severity) {
@@ -114,9 +106,17 @@ public class Task {
         this.userId = userId;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
     @Override
     public String toString() {
-        return "Task{" + "id=" + id + ", name=" + name + ", description=" + description + ", dueDate=" + dueDate + ", scope=" + scope + ", severity=" + severity + ", priority=" + priority + ", userId=" + userId + '}';
+        return "Task{" + "id=" + id + ", name=" + name + ", description=" + description + ", dueDate=" + dueDate + ", scope=" + scope + ", severity=" + severity + ", priority=" + priority + ", userId=" + userId + ", username=" + username + '}';
     }
 
 }

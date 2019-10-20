@@ -11,8 +11,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -185,11 +183,7 @@ public class UserController implements Initializable {
 
     @FXML
     private void clearButtonAction(ActionEvent event) throws Exception {
-        userIdTextField.setText(null);
-        firstNameTextField.setText(null);
-        lastNameTextField.setText(null);
-        usernameTextField.setText(null);
-        emailTextField.setText(null);
+        clearForm();
 
         getAIForUser();
 
@@ -219,6 +213,14 @@ public class UserController implements Initializable {
         lastNameTextField.setText(selectedUser.getLastName());
         usernameTextField.setText(selectedUser.getUsername());
         emailTextField.setText(selectedUser.getEmail());
+    }
+
+    private void clearForm() {
+        userIdTextField.setText(null);
+        firstNameTextField.setText(null);
+        lastNameTextField.setText(null);
+        usernameTextField.setText(null);
+        emailTextField.setText(null);
     }
 
     // Gets next auto increment value for adding another user
