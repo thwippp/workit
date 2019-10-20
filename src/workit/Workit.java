@@ -25,10 +25,10 @@ import javafx.stage.Stage;
  * @author bscha
  */
 public class Workit extends Application {
-    
+
     @Override
     public void start(Stage stage) throws Exception {
-        
+
         Parent root = FXMLLoader.load(getClass().getResource("/View_Controller/Login.fxml"));
         Scene scene = new Scene(root);
         stage.setScene(scene);
@@ -44,5 +44,5 @@ public class Workit extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-    
+
 }

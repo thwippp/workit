@@ -1,12 +1,17 @@
 package Model;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  *
  * @author Schaffeld, B. (000790777);
  */
 public class Task {
+
     private int id;
     private String name;
     private String description;
@@ -16,6 +21,16 @@ public class Task {
     private double priority;
     private int userId;
 
+//    public Task(ArrayList<String> arrayList) throws ParseException{
+//        this.id = Integer.parseInt(arrayList.get(0));
+//        this.name = arrayList.get(1);
+//        this.description = arrayList.get(2);
+//        this.dueDate =  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(arrayList.get(3));
+//        this.scope = Double.parseDouble(arrayList.get(4));
+//        this.severity = Double.parseDouble(arrayList.get(5));
+//        this.priority = Double.parseDouble(arrayList.get(6));
+//        this.userId = Integer.parseInt(arrayList.get(7));
+//    }
     public Task(int id, String name, String description, Date dueDate, double scope, double severity, double priority, int userId) {
         this.id = id;
         this.name = name;
@@ -74,7 +89,7 @@ public class Task {
     public void setScope(double scope) {
         this.scope = scope;
     }
-    
+
     public double getSeverity() {
         return severity;
     }
@@ -101,7 +116,7 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Task{" + "id=" + id + ", name=" + name + ", description=" + description + ", dueDate=" + dueDate + ", scope=" + scope + ", severity=" + severity  + ", priority=" + priority + ", userId=" + userId + '}';
+        return "Task{" + "id=" + id + ", name=" + name + ", description=" + description + ", dueDate=" + dueDate + ", scope=" + scope + ", severity=" + severity + ", priority=" + priority + ", userId=" + userId + '}';
     }
-    
+
 }

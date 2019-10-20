@@ -34,39 +34,39 @@
                                     </font>
                                 </Text>
                                 <Separator focusTraversable="false" orientation="VERTICAL" visible="false" />
-                        <HBox spacing="10.0">
-                           <children>
-                              <VBox spacing="5.0">
-                                 <children>
-                                            <Label text="Task Id" />
-                                            <TextField fx:id="taskIdTextField" alignment="CENTER" promptText="Task Id" />
+                                <HBox spacing="10.0">
+                                    <children>
+                                        <VBox spacing="5.0">
+                                            <children>
+                                                <Label text="Task Id" />
+                                                <TextField fx:id="taskIdTextField" alignment="CENTER" promptText="Task Id" />
                                                 <Label text="Description" />
-                                    <TextArea fx:id="descriptionTextArea" prefHeight="200.0" prefWidth="200.0" promptText="Description" />
-                                    <Label text="User Id" />
-                                    <TextField fx:id="userIdTextField" alignment="CENTER" editable="false" promptText="User Id" />
-                                    <Label text="Username" />
-                                    <ChoiceBox fx:id="usernameChoiceBox" prefWidth="150.0" />
-                                 </children>
-                              </VBox>
-                              <VBox prefHeight="200.0" prefWidth="100.0" spacing="5.0">
-                                 <children>
-                                            <Label text="Name" />
-                                            <TextField fx:id="nameTextField" alignment="CENTER" promptText="Task Name" />
+                                                <TextArea fx:id="descriptionTextArea" prefHeight="200.0" prefWidth="200.0" promptText="Description" />
+                                                <Label text="User Id" />
+                                                <TextField fx:id="userIdTextField" alignment="CENTER" editable="false" promptText="User Id" />
+                                                <Label text="Username" />
+                                                <ChoiceBox fx:id="usernameChoiceBox" prefWidth="150.0" />
+                                            </children>
+                                        </VBox>
+                                        <VBox prefHeight="200.0" prefWidth="100.0" spacing="5.0">
+                                            <children>
+                                                <Label text="Name" />
+                                                <TextField fx:id="nameTextField" alignment="CENTER" promptText="Task Name" />
                                                 <Label text="Due Date" />
-                                    <DatePicker fx:id="dueDateDatePicker" promptText="Due Date" />
+                                                <DatePicker fx:id="dueDateDatePicker" promptText="Due Date" />
                                                 <Label text="Scope" />
-                                    <ChoiceBox fx:id="scopeChoiceBox" prefWidth="150.0" />
-                                    <Label text="Severity" />
-                                    <ChoiceBox fx:id="severityChoiceBox" prefWidth="150.0" />
-                                    <Label text="Priority" />
-                                    <TextField fx:id="priorityTextField" alignment="CENTER" promptText="Priority" />
-                                 </children>
-                              </VBox>
-                           </children>
-                           <VBox.margin>
-                              <Insets />
-                           </VBox.margin>
-                        </HBox>
+                                                <ChoiceBox fx:id="scopeChoiceBox" prefWidth="150.0" />
+                                                <Label text="Severity" />
+                                                <ChoiceBox fx:id="severityChoiceBox" prefWidth="150.0" />
+                                                <Label text="Priority" />
+                                                <TextField fx:id="priorityTextField" alignment="CENTER" promptText="Priority" />
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                    <VBox.margin>
+                                        <Insets />
+                                    </VBox.margin>
+                                </HBox>
                                 <HBox spacing="10.0">
                                     <children>
                                         <Button fx:id="addButton" mnemonicParsing="false" onAction="#addButtonAction" text="Add / Insert" />
@@ -103,31 +103,32 @@
                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                             </HBox.margin>
                         </VBox>
-                  <VBox alignment="CENTER">
-                     <children>
-                              <TableView fx:id="userTableView" minWidth="450.0" onMouseReleased="#tableViewSelectionAction">
-                                  <columns>
-                                      <TableColumn fx:id="taskIdTableColumn" prefWidth="30.0" text="Id" />
-                                      <TableColumn fx:id="nameTableColumn" prefWidth="75.0" text="Name" />
-                                      <TableColumn fx:id="descriptionTableColumn" prefWidth="75.0" text="Description" />
-                                      <TableColumn fx:id="scopeTableColumn" prefWidth="75.0" text="Scope" />
-                                      <TableColumn fx:id="severityTableColumn" prefWidth="75.0" text="Severity" />
-                              <TableColumn fx:id="priorityTableColumn" prefWidth="75.0" text="Priority" />
-                              <TableColumn fx:id="userIdTableColumn" prefWidth="50.0" text="User Id" />
-                              <TableColumn fx:id="usernameTableColumn" prefWidth="75.0" text="Username" />
-                                  </columns>
-                              </TableView>
-                        <HBox alignment="CENTER_RIGHT">
-                           <children>
-                              <Button fx:id="reportButton" alignment="CENTER_RIGHT" contentDisplay="CENTER" mnemonicParsing="false" text="Report">
-                                 <HBox.margin>
-                                    <Insets top="5.0" />
-                                 </HBox.margin>
-                              </Button>
-                           </children>
-                        </HBox>
-                     </children>
-                  </VBox>
+                        <VBox alignment="CENTER">
+                            <children>
+                                <TableView fx:id="taskTableView" minWidth="450.0" onMouseReleased="#tableViewSelectionAction">
+                                    <columns>
+                                        <TableColumn fx:id="taskIdTableColumn" prefWidth="30.0" text="Id" />
+                                        <TableColumn fx:id="nameTableColumn" prefWidth="75.0" text="Name" />
+                                        <TableColumn fx:id="descriptionTableColumn" prefWidth="75.0" text="Description" />
+                                        <TableColumn fx:id="dueDateTableColumn" prefWidth="75.0" text="Due Date" />
+                                        <TableColumn fx:id="scopeTableColumn" prefWidth="75.0" text="Scope" />
+                                        <TableColumn fx:id="severityTableColumn" prefWidth="75.0" text="Severity" />
+                                        <TableColumn fx:id="priorityTableColumn" prefWidth="75.0" text="Priority" />
+                                        <TableColumn fx:id="userIdTableColumn" prefWidth="50.0" text="User Id" />
+                                        <TableColumn fx:id="usernameTableColumn" prefWidth="75.0" text="Username" />
+                                    </columns>
+                                </TableView>
+                                <HBox alignment="CENTER_RIGHT">
+                                    <children>
+                                        <Button fx:id="reportButton" alignment="CENTER_RIGHT" contentDisplay="CENTER" mnemonicParsing="false" text="Report">
+                                            <HBox.margin>
+                                                <Insets top="5.0" />
+                                            </HBox.margin>
+                                        </Button>
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
                     </children>
                 </HBox>
             </center>

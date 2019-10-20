@@ -21,21 +21,21 @@ public class MainController implements Initializable {
 
     @FXML
     private Button userButton;
-    
+
     @FXML
     private Button taskButton;
-            
+
     @FXML
     private Button logoutButton;
-    
+
     /**
      * Initializes the controller class.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
-    }    
-    
+    }
+
     @FXML
     private void userButtonAction(ActionEvent event) throws IOException {
 
@@ -50,7 +50,7 @@ public class MainController implements Initializable {
         stage.setScene(scene);
         stage.show();
     }
-    
+
     @FXML
     private void taskButtonAction(ActionEvent event) throws IOException {
 
@@ -65,7 +65,7 @@ public class MainController implements Initializable {
         stage.setScene(scene);
         stage.show();
     }
-    
+
     @FXML
     private void logoutButtonAction(ActionEvent event) throws IOException {
         Stage stage;
@@ -79,5 +79,5 @@ public class MainController implements Initializable {
         stage.setScene(scene);
         stage.show();
     }
-    
+
 }

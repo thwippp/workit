@@ -1,8 +1,16 @@
 package View_Controller;
 
+import Model.MYSQL;
+import Model.Master;
+import Model.Task;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -16,6 +24,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
@@ -55,25 +64,27 @@ public class TaskController implements Initializable {
     @FXML
     private Button cancelButton;
     @FXML
-    private TableView<?> userTableView;
-    @FXML
-    private TableColumn<?, ?> taskIdTableColumn;
-    @FXML
-    private TableColumn<?, ?> nameTableColumn;
-    @FXML
-    private TableColumn<?, ?> descriptionTableColumn;
-    @FXML
-    private TableColumn<?, ?> scopeTableColumn;
-    @FXML
-    private TableColumn<?, ?> severityTableColumn;
-    @FXML
-    private TableColumn<?, ?> priorityTableColumn;
-    @FXML
-    private TableColumn<?, ?> userIdTableColumn;
-    @FXML
-    private TableColumn<?, ?> usernameTableColumn;
-    @FXML
     private Button reportButton;
+    @FXML
+    private TableView<Task> taskTableView;
+    @FXML
+    private TableColumn<Task, Integer> taskIdTableColumn;
+    @FXML
+    private TableColumn<Task, String> nameTableColumn;
+    @FXML
+    private TableColumn<Task, String> descriptionTableColumn;
+    @FXML
+    private TableColumn<Task, Date> dueDateTableColumn;
+    @FXML
+    private TableColumn<Task, Double> scopeTableColumn;
+    @FXML
+    private TableColumn<Task, Double> severityTableColumn;
+    @FXML
+    private TableColumn<Task, Double> priorityTableColumn;
+    @FXML
+    private TableColumn<Task, Integer> userIdTableColumn;
+    @FXML
+    private TableColumn<Task, String> usernameTableColumn;
 
     /**
      * Initializes the controller class.
@@ -81,7 +92,18 @@ public class TaskController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
-    }    
+
+        try {
+            // Gets next auto increment value for adding another user
+            getAIForTask();
+        } catch (Exception ex) {
+        }
+
+        // Clears All Tasks, Builds new Table View, and Adds Values from DB
+        // TRUE == first time, runs the CellValueFactory and PropertyValueFactory bits
+        clearAndRebuildTableView(true);
+
+    }
 
     @FXML
     private void addButtonAction(ActionEvent event) {
@@ -101,7 +123,7 @@ public class TaskController implements Initializable {
 
     @FXML
     private void cancelButtonAction(ActionEvent event) throws IOException {
-    Stage stage;
+        Stage stage;
         Parent root;
         stage = (Stage) cancelButton.getScene().getWindow();
         //load up OTHER FXML document
@@ -116,5 +138,55 @@ public class TaskController implements Initializable {
     @FXML
     private void tableViewSelectionAction(MouseEvent event) {
     }
-    
+
+    // Gets next auto increment value for adding another task
+    private void getAIForTask() throws Exception {
+        ObservableList<ArrayList> result = null;
+        try {
+            String sql = "SELECT auto_increment FROM information_schema.tables WHERE table_name='task'";
+            result = new MYSQL().query(sql);
+
+            String tId = result.get(0).get(0).toString();
+            taskIdTextField.setText(tId);
+
+            System.out.println(result);
+        } catch (Exception ex) {
+            System.out.println("Error");
+        }
+    }
+
+    // Clears All Tasks, Builds new Table View, and Adds Values from DB
+    private void clearAndRebuildTableView(boolean isOnInitialize) {
+
+        System.out.println("Starting Clear and Rebuild...");
+
+        // Clears all users from the tableview
+        Master.deleteAllTasks();
+
+        if (isOnInitialize) {
+            // Get list of customers in CustomerScreen
+            taskTableView.setItems(Master.getAllTasks());
+            taskIdTableColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+            nameTableColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+            descriptionTableColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
+            dueDateTableColumn.setCellValueFactory(new PropertyValueFactory<>("dueDate"));
+            scopeTableColumn.setCellValueFactory(new PropertyValueFactory<>("scope"));
+            severityTableColumn.setCellValueFactory(new PropertyValueFactory<>("severity"));
+            priorityTableColumn.setCellValueFactory(new PropertyValueFactory<>("prirority"));
+            userIdTableColumn.setCellValueFactory(new PropertyValueFactory<>("userId"));
+            usernameTableColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
+        }
+
+        boolean isAdded = false;
+        try {
+            String sql = "SELECT t.id, name, description, dueDate, scope, severity, priority, t.userId, u.username FROM task t LEFT JOIN user u ON (t.userId = u.id);";
+            isAdded = new MYSQL().addTasksFromQuery(sql);
+            System.out.println(isAdded);
+        } catch (Exception ex) {
+            System.out.println("Error");
+            System.out.println(ex);
+        }
+
+    }
+
 }
