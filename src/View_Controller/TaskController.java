@@ -274,6 +274,7 @@ public class TaskController implements Initializable {
                         ps.setDouble(6, priority);
 
                         ps.execute();
+                        DBConnection.closeConnection();
                     }
 
                 } catch (SQLException ex) {
@@ -298,6 +299,7 @@ public class TaskController implements Initializable {
                         ps.setInt(7, uid);
 
                         ps.execute();
+                        DBConnection.closeConnection();
                     }
 
                 } catch (SQLException ex) {
@@ -365,6 +367,7 @@ public class TaskController implements Initializable {
                         ps.setInt(7, id);
 
                         ps.execute();
+                        DBConnection.closeConnection();
                     }
 
                 } catch (SQLException ex) {
@@ -390,6 +393,7 @@ public class TaskController implements Initializable {
                         ps.setInt(8, id);
 
                         ps.execute();
+                        DBConnection.closeConnection();
                     }
 
                 } catch (SQLException ex) {
@@ -410,7 +414,7 @@ public class TaskController implements Initializable {
         try {
             // Will catch if there is no item currently selected
             taskTableView.getSelectionModel().getSelectedItem().getId();
-            
+
             // If there is a valid item, the rest of the function will proceed
             Optional<ButtonType> deleteWarning = m.showAlert("Confirmation", "Are you sure?", "This action will permanently delete the selected task.  Press OK to continue or close this dialog if this was an error.", Alert.AlertType.CONFIRMATION);
 
@@ -429,6 +433,7 @@ public class TaskController implements Initializable {
                         ps.setInt(1, id);
 
                         ps.execute();
+                        DBConnection.closeConnection();
                     }
 
                 } catch (SQLException ex) {
@@ -524,15 +529,21 @@ public class TaskController implements Initializable {
     @FXML
     private void reportTxtButtonAction() throws IOException {
         System.out.println("Starting TXT Report");
-        createReportFile("TaskExportTXT", true);
-        System.out.println("Finished TXT Report");
+        Optional<ButtonType> reportTxtNotification = m.showAlert("Exporting", "Generating TXT Report", "Generating a report.  You can find it in your default home directory with the name TaskExportTXT.txt.\nPress OK to continue.  Close this dialog or select CANCEL to abort.", Alert.AlertType.CONFIRMATION);
+        if (reportTxtNotification.get() == ButtonType.OK) {
+            createReportFile("TaskExportTXT", true);
+            System.out.println("Finished TXT Report");
+        }
     }
 
     @FXML
     private void reportCsvButtonAction() throws IOException {
         System.out.println("Starting CSV Report");
-        createReportFile("TaskExportCSV", false);
-        System.out.println("Finished CSV Report");
+        Optional<ButtonType> reportCsvNotification = m.showAlert("Exporting", "Generating CSV Report", "Generating a report.  You can find it in your default home directory with the name TaskExportCSV.csv.\nPress OK to continue.  Close this dialog or select CANCEL to abort.", Alert.AlertType.CONFIRMATION);
+        if (reportCsvNotification.get() == ButtonType.OK) {
+            createReportFile("TaskExportCSV", false);
+            System.out.println("Finished CSV Report");
+        }
     }
 
     private double setPriority(double inputScope, double inputSeverity) {

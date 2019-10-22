@@ -1,5 +1,6 @@
 package Model;
 
+import com.mysql.cj.jdbc.ConnectionImpl;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
@@ -11,8 +12,9 @@ public class DBConnection {
 
     // Connection credentials
     private static final String DB = "workit";
-    private static final String URL = "jdbc:mysql://localhost:3306/" + DB;
-    private static final String USER = "test";
+    private static final String IP = "localhost";
+    private static final String URL = "jdbc:mysql://"+ IP +":3306/" + DB;
+    private static final String USER = "test";  // TODO-- make config file or default user
     private static final String PASSWORD = "test";
     private static final String DRIVER = "com.mysql.cj.jdbc.Driver";
 
@@ -28,9 +30,10 @@ public class DBConnection {
         return conn;
     }
 
-    public static void closeConnection() throws Exception {
-        conn.close();
-        System.out.println("Connection closed.");
+    public static boolean closeConnection() throws Exception {
+        DBConnection.conn.close();
+        System.out.println("Connection closed? "  + conn.isClosed());
+        return DBConnection.conn.isClosed();
     }
 
 }

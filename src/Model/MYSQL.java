@@ -33,11 +33,6 @@ public class MYSQL {
 
             while (rs.next()) {
 
-//                ArrayList<String> row = new ArrayList<String>();
-//
-//                for (int i = 0; i < rsCols; i++) {
-//                    row.add(rs.getString(i + 1));
-//                }
                 Master.addUser(
                         new User(
                                 rs.getInt("id"),
@@ -164,13 +159,13 @@ public class MYSQL {
 
             for (int i = 0; i < rsCols; i++) {
                 String cString = rs.getString(i + 1);
-                row.add(cString); // DOES SOMETHING.... TODO
+                row.add(cString);
 
             }
 
             // TODO SOMETHING
         }
-        System.out.println("return...");
+        System.out.println("Return booleanQuery...");
         DBConnection.closeConnection();
         return true;
     }

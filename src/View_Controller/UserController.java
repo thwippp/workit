@@ -144,6 +144,7 @@ public class UserController implements Initializable {
                     ps.setString(4, email);
 
                     ps.execute();
+                    DBConnection.closeConnection();
                 }
 
             } catch (SQLException ex) {
@@ -207,6 +208,8 @@ public class UserController implements Initializable {
                 ps.setInt(5, id);
 
                 ps.execute();
+                DBConnection.closeConnection();
+
             }
 
         } catch (SQLException ex) {
@@ -240,6 +243,8 @@ public class UserController implements Initializable {
                     ps.setInt(1, id);
 
                     ps.execute();
+                    DBConnection.closeConnection();
+
                 }
 
             } catch (SQLException ex) {

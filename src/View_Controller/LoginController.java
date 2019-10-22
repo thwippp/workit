@@ -2,7 +2,6 @@ package View_Controller;
 
 import Model.DBConnection;
 import Model.Master;
-import Model.Notification;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.CallableStatement;
@@ -18,17 +17,11 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
-import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
-import static javafx.scene.control.Alert.AlertType.INFORMATION;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
@@ -92,21 +85,21 @@ public class LoginController implements Initializable {
             // Get password
             String password = passwordPasswordField.getText().trim();
 
-            Boolean isAuthenticated = null;
+            Boolean isAuthenticated = false;
 
-            // Call "callable function"
-            Connection conn = DBConnection.getConnection();
-            String q = "{call authenticateUser(?,?)}";
-            CallableStatement cs = null;
-            cs = conn.prepareCall(q);
-            cs.setString(1, username);
-            cs.setString(2, password);
-            ResultSet rs = cs.executeQuery();
+            try ( // Call "callable function"
+                    Connection conn = DBConnection.getConnection()) {
+                String q = "{call authenticateUser(?,?)}";
+                CallableStatement cs;
+                cs = conn.prepareCall(q);
+                cs.setString(1, username);
+                cs.setString(2, password);
+                ResultSet rs = cs.executeQuery();
 
-            while (rs.next()) {
-                isAuthenticated = rs.getBoolean("IsAuthenticated");
+                while (rs.next()) {
+                    isAuthenticated = rs.getBoolean("IsAuthenticated");
+                }
             }
-            conn.close();
 
             // Process results
             if (isAuthenticated) {

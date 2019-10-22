@@ -1,5 +1,6 @@
 package Model;
 
+import java.sql.ResultSet;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
