@@ -10,7 +10,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.regex.Pattern;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -18,7 +20,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -66,6 +70,8 @@ public class UserController implements Initializable {
     @FXML
     private TableColumn<User, String> emailTableColumn;
 
+    Master m = new Master();
+
     /**
      * Initializes the controller class.
      *
@@ -89,53 +95,106 @@ public class UserController implements Initializable {
 
     @FXML
     private void addButtonAction(ActionEvent event) throws Exception {
+        // Checks for null and blanks
+        // Checks for "too long" data fields
+        // Checks for only letters in First Name and Last Name fields
+        // Checks for  @ and . in email 
 
-        int id = Integer.parseInt(userIdTextField.getText().trim());
-        String first = firstNameTextField.getText().trim();
-        String last = lastNameTextField.getText().trim();
-        String username = usernameTextField.getText().trim();
-        String email = emailTextField.getText().trim();
+        // Checks for null values and blanks
+        boolean isUserIdBlank = userIdTextField.getText() == null || userIdTextField.getText().trim().isEmpty();
+        boolean isFirstBlank = firstNameTextField.getText() == null || firstNameTextField.getText().trim().isEmpty();
+        boolean isLastBlank = lastNameTextField.getText() == null || lastNameTextField.getText().trim().isEmpty();
+        boolean isUsernameBlank = usernameTextField.getText() == null || usernameTextField.getText().trim().isEmpty();
+        boolean isEmailBlank = emailTextField.getText() == null || emailTextField.getText().trim().isEmpty();
 
-        try {
-            System.out.println("Starting Insert...");
+        if (isUserIdBlank || isFirstBlank || isLastBlank || isUsernameBlank || isEmailBlank) {
+            Optional<ButtonType> e = m.showAlert("Error", "Invalid Data", "Sorry.  Please do not leave any field blank.", Alert.AlertType.ERROR);
+            System.out.println("Invalid Data.");
+        } else if (String.valueOf(userIdTextField.getText().trim()).length() > 11 || (firstNameTextField.getText().trim().length() > 255 || lastNameTextField.getText().trim().length() > 255 || usernameTextField.getText().trim().length() > emailTextField.getText().length())) {
+            // Checks each field for length requirements
+            Optional<ButtonType> e = m.showAlert("Error", "Invalid Data", "Sorry.  Data is too long.", Alert.AlertType.ERROR);
+            System.out.println("Data too long.");
+        } else if (!Pattern.matches(".*\\D.*", firstNameTextField.getText()) || !Pattern.matches("[a-z A-Z]+", lastNameTextField.getText())) {
+            // Do something
+            Optional<ButtonType> e = m.showAlert("Error", "Invalid Data", "Sorry.  The First and Last Name fields can only contain letters.", Alert.AlertType.ERROR);
+            System.out.println("Only letters violation.");
+        } else if (!Pattern.matches("\\w*@\\w*\\.\\w*", emailTextField.getText())) {
+            // Do something
+            Optional<ButtonType> e = m.showAlert("Error", "Invalid Data", "Sorry.  Email addresses must have both \"@\" and \".\"", Alert.AlertType.ERROR);
+            System.out.println("Invalid Email.");
+        } else {
 
-            String q = "INSERT INTO user (firstName, lastName, username, email) VALUES (?, ?, ?, ?);";
-            try (Connection conn = DBConnection.getConnection()) {
-                PreparedStatement ps = conn.prepareStatement(q);
+            int id = Integer.parseInt(userIdTextField.getText().trim());
+            String first = firstNameTextField.getText().trim();
+            String last = lastNameTextField.getText().trim();
+            String username = usernameTextField.getText().trim();
+            String email = emailTextField.getText().trim();
 
-                ps.setString(1, first);
-                ps.setString(2, last);
-                ps.setString(3, username);
-                ps.setString(4, email);
+            try {
+                System.out.println("Valid Data.");
+                System.out.println("Starting Insert...");
 
-                ps.execute();
+                String q = "INSERT INTO user (firstName, lastName, username, email) VALUES (?, ?, ?, ?);";
+                try (Connection conn = DBConnection.getConnection()) {
+                    PreparedStatement ps = conn.prepareStatement(q);
+
+                    ps.setString(1, first);
+                    ps.setString(2, last);
+                    ps.setString(3, username);
+                    ps.setString(4, email);
+
+                    ps.execute();
+                }
+
+            } catch (SQLException ex) {
+                System.out.println(ex);
             }
 
-        } catch (SQLException ex) {
-            System.out.println(ex);
+            // Clears intake form
+            clearForm();
+
+            // Rebuilt TableView
+            clearAndRebuildTableView(false);
+
+            // Get next AI PK for User
+            getAIForUser();
         }
-
-        // Clears intake form
-        clearForm();
-
-        // Rebuilt TableView
-        clearAndRebuildTableView(false);
-
-        // Get next AI PK for User
-        getAIForUser();
-
     }
 
     @FXML
     private void updateButtonAction(ActionEvent event) throws Exception {
-        int id = Integer.parseInt(userIdTextField.getText().trim());
-        String first = firstNameTextField.getText().trim();
-        String last = lastNameTextField.getText().trim();
-        String username = usernameTextField.getText().trim();
-        String email = emailTextField.getText().trim();
 
+        // Checks for null values and blanks
+        boolean isUserIdBlank = userIdTextField.getText() == null || userIdTextField.getText().trim().isEmpty();
+        boolean isFirstBlank = firstNameTextField.getText() == null || firstNameTextField.getText().trim().isEmpty();
+        boolean isLastBlank = lastNameTextField.getText() == null || lastNameTextField.getText().trim().isEmpty();
+        boolean isUsernameBlank = usernameTextField.getText() == null || usernameTextField.getText().trim().isEmpty();
+        boolean isEmailBlank = emailTextField.getText() == null || emailTextField.getText().trim().isEmpty();
+
+        if (isUserIdBlank || isFirstBlank || isLastBlank || isUsernameBlank || isEmailBlank) {
+            Optional<ButtonType> e = m.showAlert("Error", "Invalid Data", "Sorry.  Please do not leave any field blank.", Alert.AlertType.ERROR);
+            System.out.println("Invalid Data.");
+        } else if (String.valueOf(userIdTextField.getText().trim()).length() > 11 || (firstNameTextField.getText().trim().length() > 255 || lastNameTextField.getText().trim().length() > 255 || usernameTextField.getText().trim().length() > emailTextField.getText().length())) {
+            // Checks each field for length requirements
+            Optional<ButtonType> e = m.showAlert("Error", "Invalid Data", "Sorry.  Data is too long.", Alert.AlertType.ERROR);
+            System.out.println("Data too long.");
+        } else if (!Pattern.matches(".*\\D.*", firstNameTextField.getText()) || !Pattern.matches("[a-z A-Z]+", lastNameTextField.getText())) {
+            // Do something
+            Optional<ButtonType> e = m.showAlert("Error", "Invalid Data", "Sorry.  The First and Last Name fields can only contain letters.", Alert.AlertType.ERROR);
+            System.out.println("Only letters violation.");
+        } else if (!Pattern.matches("\\w*@\\w*\\.\\w*", emailTextField.getText())) {
+            // Do something
+            Optional<ButtonType> e = m.showAlert("Error", "Invalid Data", "Sorry.  Email addresses must have both \"@\" and \".\"", Alert.AlertType.ERROR);
+            System.out.println("Invalid Email.");
+        }
         try {
             System.out.println("Starting Update...");
+
+            int id = Integer.parseInt(userIdTextField.getText().trim());
+            String first = firstNameTextField.getText().trim();
+            String last = lastNameTextField.getText().trim();
+            String username = usernameTextField.getText().trim();
+            String email = emailTextField.getText().trim();
 
             String q = "UPDATE USER SET firstName = ?, lastName = ?, username = ?, email = ? WHERE id = ?;";
             try (Connection conn = DBConnection.getConnection()) {
@@ -164,26 +223,32 @@ public class UserController implements Initializable {
 
     @FXML
     private void deleteButtonAction(ActionEvent event) throws Exception {
-        int id = Integer.parseInt(userIdTextField.getText().trim());
+        Optional<ButtonType> deleteWarning = m.showAlert("Confirmation", "Are you sure?", "This action will permanently delete the selected user.  Press OK to continue or close this dialog if this was an error.", Alert.AlertType.CONFIRMATION);
 
-        try {
-            System.out.println("Starting Delete...");
+        if (deleteWarning.get() == ButtonType.OK) {
+            System.out.println("Delete user!");
 
-            String q = "DELETE FROM USER WHERE id = ?;";
-            try (Connection conn = DBConnection.getConnection()) {
-                PreparedStatement ps = conn.prepareStatement(q);
+            int id = Integer.parseInt(userIdTextField.getText().trim());
 
-                ps.setInt(1, id);
+            try {
+                System.out.println("Starting Delete...");
 
-                ps.execute();
+                String q = "DELETE FROM user WHERE id = ?;";
+                try (Connection conn = DBConnection.getConnection()) {
+                    PreparedStatement ps = conn.prepareStatement(q);
+
+                    ps.setInt(1, id);
+
+                    ps.execute();
+                }
+
+            } catch (SQLException ex) {
+                System.out.println(ex);
             }
 
-        } catch (SQLException ex) {
-            System.out.println(ex);
+            // Rebuilt TableView
+            clearAndRebuildTableView(false);
         }
-
-        // Rebuilt TableView
-        clearAndRebuildTableView(false);
     }
 
     @FXML
@@ -212,12 +277,17 @@ public class UserController implements Initializable {
 
     @FXML
     private void tableViewSelectionAction(MouseEvent event) {
-        User selectedUser = userTableView.getSelectionModel().getSelectedItem();
-        userIdTextField.setText(String.valueOf(selectedUser.getId()));
-        firstNameTextField.setText(selectedUser.getFirstName());
-        lastNameTextField.setText(selectedUser.getLastName());
-        usernameTextField.setText(selectedUser.getUsername());
-        emailTextField.setText(selectedUser.getEmail());
+        try {
+            User selectedUser = userTableView.getSelectionModel().getSelectedItem();
+            userIdTextField.setText(String.valueOf(selectedUser.getId()));
+            firstNameTextField.setText(selectedUser.getFirstName());
+            lastNameTextField.setText(selectedUser.getLastName());
+            usernameTextField.setText(selectedUser.getUsername());
+            emailTextField.setText(selectedUser.getEmail());
+        } catch (Exception e) {
+            Optional<ButtonType> tableViewSelectionError = m.showAlert("Error", "Nothing Selected", "Please select a valid user from the table on the right.", Alert.AlertType.ERROR);
+            System.out.println("Invalid Table Selection.");
+        }
     }
 
     private void clearForm() {

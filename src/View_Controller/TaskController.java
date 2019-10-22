@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,7 +33,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableColumn;
@@ -40,9 +43,11 @@ import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import javax.swing.filechooser.FileSystemView;
 
 /**
@@ -107,6 +112,12 @@ public class TaskController implements Initializable {
     @FXML
     private TableColumn<Task, String> usernameTableColumn;
 
+    Master m = new Master();
+
+    final Tooltip scopeTooltip = new Tooltip();
+    final Tooltip severityTooltip = new Tooltip();
+    final Tooltip readOnlyTooltip = new Tooltip();
+
     /**
      * Initializes the controller class.
      *
@@ -115,6 +126,20 @@ public class TaskController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+
+        // Set Tooltips
+        readOnlyTooltip.setText("Read Only");
+        taskIdTextField.setTooltip(readOnlyTooltip);
+        userIdTextField.setTooltip(readOnlyTooltip);
+        priorityTextField.setTooltip(readOnlyTooltip);
+
+        scopeTooltip.setText("1.0 = Isolated, 2.0 = Pattern, 3.0 = Widespread");
+        scopeChoiceBox.setTooltip(scopeTooltip);
+
+        severityTooltip.setText("1.0 = Low, 2.0 = Med, 3.0 = High");
+        severityChoiceBox.setTooltip(severityTooltip);
+
+        // Initialize Choiceboxes
         // Scope
         scopeChoiceBox.getItems().addAll(1.0, 2.0, 3.0);
 
@@ -158,8 +183,6 @@ public class TaskController implements Initializable {
                 }
                 );
 
-        // TODO-- add dueDate as a + 1 (justifies using double)
-        // TODO-- change 1, 2, 3 to High, Mediumn, Low and Narrow, Pattern, Widespread
         scopeChoiceBox.getSelectionModel().selectedItemProperty()
                 .addListener((obs, oldV, newV) -> {
                     try {
@@ -206,144 +229,219 @@ public class TaskController implements Initializable {
 
     @FXML
     private void addButtonAction(ActionEvent event) throws Exception {
-        String name = nameTextField.getText().trim().toLowerCase();
-        String description = descriptionTextArea.getText().trim().toLowerCase();
-        String stringDueDate = dueDateDatePicker.getValue().toString();
-        DateFormat dueDateDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        Date dateDueDate = dueDateDateFormat.parse(stringDueDate);
-        java.sql.Date sqlDueDate = new java.sql.Date(dateDueDate.getTime());
+        // Checks for null and blanks
+        // Checks for "too long" data fields
 
-        double scope = scopeChoiceBox.getValue();
-        double severity = severityChoiceBox.getValue();
-        double priority = Double.parseDouble(priorityTextField.getText().trim());
-        int uid = Integer.parseInt(userIdTextField.getText().trim());
+        boolean isNameBlank = nameTextField.getText() == null || nameTextField.getText().trim().isEmpty();
+        boolean isDueDateBlank = dueDateDatePicker.getValue() == null;
+        boolean isScopeBlank = scopeChoiceBox.getValue() == null;
+        boolean isSeverityBlank = severityChoiceBox.getValue() == null;
 
-        try {
-            System.out.println("Starting Insert...");
+        if (isNameBlank || isDueDateBlank || isScopeBlank || isSeverityBlank) {
+            Optional<ButtonType> e = m.showAlert("Error", "Invalid Data", "Sorry.  Please do not leave any field blank.", Alert.AlertType.ERROR);
+            System.out.println("Invalid Data.");
+        } else if (nameTextField.getText().trim().length() > 255 || descriptionTextArea.getText().trim().length() > 255) {
+// Checks each field for length requirements
+            Optional<ButtonType> e = m.showAlert("Error", "Invalid Data", "Sorry.  Data is too long.", Alert.AlertType.ERROR);
+            System.out.println("Data too long.");
+        } else {
+            String name = nameTextField.getText().trim().toLowerCase();
+            String description = descriptionTextArea.getText().trim().toLowerCase();
+            String stringDueDate = dueDateDatePicker.getValue().toString();
+            DateFormat dueDateDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            Date dateDueDate = dueDateDateFormat.parse(stringDueDate);
+            java.sql.Date sqlDueDate = new java.sql.Date(dateDueDate.getTime());
 
-            String q = "INSERT INTO task (name, description, dueDate, scope, severity, priority, userId) VALUES (?,?,?,?,?,?,?);";
-            try (Connection conn = DBConnection.getConnection()) {
-                PreparedStatement ps = conn.prepareStatement(q);
+            double scope = scopeChoiceBox.getValue();
+            double severity = severityChoiceBox.getValue();
+            double priority = Double.parseDouble(priorityTextField.getText().trim());
 
-                ps.setString(1, name);
-                ps.setString(2, description);
-                ps.setDate(3, sqlDueDate);
-                ps.setDouble(4, scope);
-                ps.setDouble(5, severity);
-                ps.setDouble(6, priority);
-                ps.setInt(7, uid);
+            boolean isUserIdBlank = userIdTextField.getText() == null || userIdTextField.getText().trim().isEmpty();
 
-                ps.execute();
+            if (isUserIdBlank) {
+                try {
+                    System.out.println("Starting Insert...");
+
+                    String q = "INSERT INTO task (name, description, dueDate, scope, severity, priority) VALUES (?,?,?,?,?,?);";
+                    try (Connection conn = DBConnection.getConnection()) {
+                        PreparedStatement ps = conn.prepareStatement(q);
+
+                        ps.setString(1, name);
+                        ps.setString(2, description);
+                        ps.setDate(3, sqlDueDate);
+                        ps.setDouble(4, scope);
+                        ps.setDouble(5, severity);
+                        ps.setDouble(6, priority);
+
+                        ps.execute();
+                    }
+
+                } catch (SQLException ex) {
+                    System.out.println(ex);
+                }
+            } else {
+                int uid = Integer.parseInt(userIdTextField.getText().trim());
+
+                try {
+                    System.out.println("Starting Insert...");
+
+                    String q = "INSERT INTO task (name, description, dueDate, scope, severity, priority) VALUES (?,?,?,?,?,?,?);";
+                    try (Connection conn = DBConnection.getConnection()) {
+                        PreparedStatement ps = conn.prepareStatement(q);
+
+                        ps.setString(1, name);
+                        ps.setString(2, description);
+                        ps.setDate(3, sqlDueDate);
+                        ps.setDouble(4, scope);
+                        ps.setDouble(5, severity);
+                        ps.setDouble(6, priority);
+                        ps.setInt(7, uid);
+
+                        ps.execute();
+                    }
+
+                } catch (SQLException ex) {
+                    System.out.println(ex);
+                }
             }
 
-        } catch (SQLException ex) {
-            System.out.println(ex);
+            // Clears intake form
+            clearForm();
+
+            // Rebuilt TableView
+            clearAndRebuildTableView(false);
+
+            // Get next AI PK for User
+            getAIForTask();
         }
-
-        // Clears intake form
-        clearForm();
-
-        // Rebuilt TableView
-        clearAndRebuildTableView(false);
-
-        // Get next AI PK for User
-        getAIForTask();
     }
 
     @FXML
     private void updateButtonAction(ActionEvent event) throws ParseException, Exception {
-        int id = Integer.parseInt(taskIdTextField.getText().trim());
-        String name = nameTextField.getText().trim();
-        String description = descriptionTextArea.getText().trim();
-        String stringDueDate = dueDateDatePicker.getValue().toString();
-        DateFormat dueDateDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        Date dateDueDate = dueDateDateFormat.parse(stringDueDate);
-        java.sql.Date sqlDueDate = new java.sql.Date(dateDueDate.getTime());
+        // Checks for null and blanks
+        // Checks for "too long" data fields
 
-        double scope = scopeChoiceBox.getValue();
-        double severity = severityChoiceBox.getValue();
-        double priority = Double.parseDouble(priorityTextField.getText().trim());
+        boolean isNameBlank = nameTextField.getText() == null || nameTextField.getText().trim().isEmpty();
+        boolean isDueDateBlank = dueDateDatePicker.getValue() == null;
+        boolean isScopeBlank = scopeChoiceBox.getValue() == null;
+        boolean isSeverityBlank = severityChoiceBox.getValue() == null;
 
-        String sUid = userIdTextField.getText();
-
-        if (sUid == null) {
-            try {
-                System.out.println("Starting Update (uid null)...");
-
-                String q = "UPDATE task SET name = ?, description = ?, dueDate = ?, scope = ?, severity = ?, priority = ? WHERE id = ?;";
-                try (Connection conn = DBConnection.getConnection()) {
-                    PreparedStatement ps = conn.prepareStatement(q);
-
-                    ps.setString(1, name);
-                    ps.setString(2, description);
-                    ps.setDate(3, sqlDueDate);
-                    ps.setDouble(4, scope);
-                    ps.setDouble(5, severity);
-                    ps.setDouble(6, priority);
-                    ps.setInt(7, id);
-
-                    ps.execute();
-                }
-
-            } catch (SQLException ex) {
-                System.out.println(ex);
-            }
+        if (isNameBlank || isDueDateBlank || isScopeBlank || isSeverityBlank) {
+            Optional<ButtonType> e = m.showAlert("Error", "Invalid Data", "Sorry.  Please do not leave any field blank.", Alert.AlertType.ERROR);
+            System.out.println("Invalid Data.");
+        } else if (nameTextField.getText().trim().length() > 255 || descriptionTextArea.getText().trim().length() > 255) {
+// Checks each field for length requirements
+            Optional<ButtonType> e = m.showAlert("Error", "Invalid Data", "Sorry.  Data is too long.", Alert.AlertType.ERROR);
+            System.out.println("Data too long.");
         } else {
-            try {
-                System.out.println("Starting Update (uid not null)...");
+            int id = Integer.parseInt(taskIdTextField.getText().trim());
+            String name = nameTextField.getText().trim();
+            String description = descriptionTextArea.getText().trim();
+            String stringDueDate = dueDateDatePicker.getValue().toString();
+            DateFormat dueDateDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            Date dateDueDate = dueDateDateFormat.parse(stringDueDate);
+            java.sql.Date sqlDueDate = new java.sql.Date(dateDueDate.getTime());
 
-                int uid = Integer.parseInt(userIdTextField.getText().trim());
+            double scope = scopeChoiceBox.getValue();
+            double severity = severityChoiceBox.getValue();
+            double priority = Double.parseDouble(priorityTextField.getText().trim());
 
-                String q = "UPDATE task SET name = ?, description = ?, dueDate = ?, scope = ?, severity = ?, priority = ?, userId = ? WHERE id = ?;";
-                try (Connection conn = DBConnection.getConnection()) {
-                    PreparedStatement ps = conn.prepareStatement(q);
+            String sUid = userIdTextField.getText();
 
-                    ps.setString(1, name);
-                    ps.setString(2, description);
-                    ps.setDate(3, sqlDueDate);
-                    ps.setDouble(4, scope);
-                    ps.setDouble(5, severity);
-                    ps.setDouble(6, priority);
-                    ps.setInt(7, uid);
-                    ps.setInt(8, id);
+            if (sUid == null) {
+                try {
+                    System.out.println("Starting Update (uid null)...");
 
-                    ps.execute();
+                    String q = "UPDATE task SET name = ?, description = ?, dueDate = ?, scope = ?, severity = ?, priority = ? WHERE id = ?;";
+                    try (Connection conn = DBConnection.getConnection()) {
+                        PreparedStatement ps = conn.prepareStatement(q);
+
+                        ps.setString(1, name);
+                        ps.setString(2, description);
+                        ps.setDate(3, sqlDueDate);
+                        ps.setDouble(4, scope);
+                        ps.setDouble(5, severity);
+                        ps.setDouble(6, priority);
+                        ps.setInt(7, id);
+
+                        ps.execute();
+                    }
+
+                } catch (SQLException ex) {
+                    System.out.println(ex);
                 }
+            } else {
+                try {
+                    System.out.println("Starting Update (uid not null)...");
 
-            } catch (SQLException ex) {
-                System.out.println(ex);
+                    int uid = Integer.parseInt(userIdTextField.getText().trim());
+
+                    String q = "UPDATE task SET name = ?, description = ?, dueDate = ?, scope = ?, severity = ?, priority = ?, userId = ? WHERE id = ?;";
+                    try (Connection conn = DBConnection.getConnection()) {
+                        PreparedStatement ps = conn.prepareStatement(q);
+
+                        ps.setString(1, name);
+                        ps.setString(2, description);
+                        ps.setDate(3, sqlDueDate);
+                        ps.setDouble(4, scope);
+                        ps.setDouble(5, severity);
+                        ps.setDouble(6, priority);
+                        ps.setInt(7, uid);
+                        ps.setInt(8, id);
+
+                        ps.execute();
+                    }
+
+                } catch (SQLException ex) {
+                    System.out.println(ex);
+                }
             }
+
+            // Clears intake form
+            clearForm();
+
+            // Rebuilt TableView
+            clearAndRebuildTableView(false);
         }
-
-        // Clears intake form
-        clearForm();
-
-        // Rebuilt TableView
-        clearAndRebuildTableView(false);
     }
 
     @FXML
     private void deleteButtonAction(ActionEvent event) throws Exception {
-        int id = Integer.parseInt(taskIdTextField.getText().trim());
-
         try {
-            System.out.println("Starting Delete...");
+            // Will catch if there is no item currently selected
+            taskTableView.getSelectionModel().getSelectedItem().getId();
+            
+            // If there is a valid item, the rest of the function will proceed
+            Optional<ButtonType> deleteWarning = m.showAlert("Confirmation", "Are you sure?", "This action will permanently delete the selected task.  Press OK to continue or close this dialog if this was an error.", Alert.AlertType.CONFIRMATION);
 
-            String q = "DELETE FROM task WHERE id = ?;";
-            try (Connection conn = DBConnection.getConnection()) {
-                PreparedStatement ps = conn.prepareStatement(q);
+            if (deleteWarning.get() == ButtonType.OK) {
+                System.out.println("Delete task!");
 
-                ps.setInt(1, id);
+                int id = Integer.parseInt(taskIdTextField.getText().trim());
 
-                ps.execute();
+                try {
+                    System.out.println("Starting Delete...");
+
+                    String q = "DELETE FROM task WHERE id = ?;";
+                    try (Connection conn = DBConnection.getConnection()) {
+                        PreparedStatement ps = conn.prepareStatement(q);
+
+                        ps.setInt(1, id);
+
+                        ps.execute();
+                    }
+
+                } catch (SQLException ex) {
+                    System.out.println(ex);
+                }
+
+                // Rebuilt TableView
+                clearAndRebuildTableView(false);
             }
-
-        } catch (SQLException ex) {
-            System.out.println(ex);
+        } catch (Exception e) {
+            Optional<ButtonType> tableViewSelectionError = m.showAlert("Error", "Nothing Selected", "Please select a valid task from the table on the right.", Alert.AlertType.ERROR);
+            System.out.println("Invalid Table Selection.");
         }
-
-        // Rebuilt TableView
-        clearAndRebuildTableView(false);
 
     }
 
@@ -372,49 +470,54 @@ public class TaskController implements Initializable {
 
     @FXML
     private void tableViewSelectionAction(MouseEvent event) {
-        Task selectedTask = taskTableView.getSelectionModel().getSelectedItem();
-        taskIdTextField.setText(String.valueOf(selectedTask.getId()));
-        nameTextField.setText(selectedTask.getName());
-        descriptionTextArea.setText(selectedTask.getDescription());
-
-        // DueDate DatePicker Converting
-        java.util.Date jud = new java.util.Date(selectedTask.getDueDate().getTime());
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(jud);
-        int year = cal.get(Calendar.YEAR);
-        int month = cal.get(Calendar.MONTH);
-        int day = cal.get(Calendar.DAY_OF_MONTH);
-
-        dueDateDatePicker.setValue(LocalDate.of(year, month, day));
-
-        scopeChoiceBox.setValue(selectedTask.getScope());
-        severityChoiceBox.setValue(selectedTask.getSeverity());
-        priorityTextField.setText(String.valueOf(selectedTask.getPriority()));
-
-        int uid = selectedTask.getUserId();
-        if (uid > 0) {
-            userIdTextField.setText(String.valueOf(uid));
-        } else {
-            userIdTextField.setText(null);
-        }
-
-        TablePosition pos = taskTableView.getSelectionModel().getSelectedCells().get(0);
-        int row = pos.getRow();
-        int col = taskTableView.getColumns().size();
-        for (int c = 0; c < taskTableView.getColumns().size(); c++) {
-            String cHeader = taskTableView.getColumns().get(c).getText();
-            if (cHeader.equals("Username")) {
-                col = c;
-            }
-        }
-
-        String un = null;
         try {
-            un = (String) taskTableView.getColumns().get(col).getCellObservableValue(row).getValue();
-            usernameChoiceBox.setValue(un);
+            Task selectedTask = taskTableView.getSelectionModel().getSelectedItem();
+            taskIdTextField.setText(String.valueOf(selectedTask.getId()));
+            nameTextField.setText(selectedTask.getName());
+            descriptionTextArea.setText(selectedTask.getDescription());
+
+            // DueDate DatePicker Converting
+            java.util.Date jud = new java.util.Date(selectedTask.getDueDate().getTime());
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(jud);
+            int year = cal.get(Calendar.YEAR);
+            int month = cal.get(Calendar.MONTH);
+            int day = cal.get(Calendar.DAY_OF_MONTH);
+
+            dueDateDatePicker.setValue(LocalDate.of(year, month, day));
+
+            scopeChoiceBox.setValue(selectedTask.getScope());
+            severityChoiceBox.setValue(selectedTask.getSeverity());
+            priorityTextField.setText(String.valueOf(selectedTask.getPriority()));
+
+            int uid = selectedTask.getUserId();
+            if (uid > 0) {
+                userIdTextField.setText(String.valueOf(uid));
+            } else {
+                userIdTextField.setText(null);
+            }
+
+            TablePosition pos = taskTableView.getSelectionModel().getSelectedCells().get(0);
+            int row = pos.getRow();
+            int col = taskTableView.getColumns().size();
+            for (int c = 0; c < taskTableView.getColumns().size(); c++) {
+                String cHeader = taskTableView.getColumns().get(c).getText();
+                if (cHeader.equals("Username")) {
+                    col = c;
+                }
+            }
+
+            String un = null;
+            try {
+                un = (String) taskTableView.getColumns().get(col).getCellObservableValue(row).getValue();
+                usernameChoiceBox.setValue(un);
+            } catch (Exception e) {
+                System.out.println("Catch...");
+                System.out.println(e);
+            }
         } catch (Exception e) {
-            System.out.println("Catch...");
-            System.out.println(e);
+            Optional<ButtonType> tableViewSelectionError = m.showAlert("Error", "Nothing Selected", "Please select a valid user from the table on the right.", Alert.AlertType.ERROR);
+            System.out.println("Invalid Table Selection.");
         }
     }
 
@@ -495,8 +598,7 @@ public class TaskController implements Initializable {
 
             FileSystemView filesys = FileSystemView.getFileSystemView();
 
-            File[] roots = filesys.getRoots();
-
+//            File[] roots = filesys.getRoots();
             String path = filesys.getHomeDirectory().getPath();
 
             if (isTxt) {
