@@ -18,15 +18,14 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -47,7 +46,6 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 import javax.swing.filechooser.FileSystemView;
 
 /**
@@ -76,6 +74,8 @@ public class TaskController implements Initializable {
     @FXML
     private TextField priorityTextField;
     @FXML
+    private TextField searchTextField;
+    @FXML
     private Button addButton;
     @FXML
     private Button updateButton;
@@ -85,6 +85,10 @@ public class TaskController implements Initializable {
     private Button clearButton;
     @FXML
     private Button cancelButton;
+    @FXML
+    private Button searchButton;
+    @FXML
+    private Button clearSearchButton;
     @FXML
     private ChoiceBox<String> sortExportByChoiceBox;
     @FXML
@@ -117,6 +121,7 @@ public class TaskController implements Initializable {
     final Tooltip scopeTooltip = new Tooltip();
     final Tooltip severityTooltip = new Tooltip();
     final Tooltip readOnlyTooltip = new Tooltip();
+    final Tooltip searchTooltip = new Tooltip();
 
     /**
      * Initializes the controller class.
@@ -132,12 +137,16 @@ public class TaskController implements Initializable {
         taskIdTextField.setTooltip(readOnlyTooltip);
         userIdTextField.setTooltip(readOnlyTooltip);
         priorityTextField.setTooltip(readOnlyTooltip);
+        
 
         scopeTooltip.setText("1.0 = Isolated, 2.0 = Pattern, 3.0 = Widespread");
         scopeChoiceBox.setTooltip(scopeTooltip);
 
         severityTooltip.setText("1.0 = Low, 2.0 = Med, 3.0 = High");
         severityChoiceBox.setTooltip(severityTooltip);
+        
+        searchTooltip.setText("Begin typing to search Name and Description Fields.");
+        searchTextField.setTooltip(searchTooltip);
 
         // Initialize Choiceboxes
         // Scope
@@ -204,7 +213,39 @@ public class TaskController implements Initializable {
                     System.out.println("Severity changed: " + newV);
                 }
                 );
-//        setPriority(scopeChoiceBox.getValue(),severityChoiceBox.getValue());
+
+        // Methodology and code snippets for the search functionality curteosy of https://code.makery.ch/blog/javafx-8-tableview-sorting-filtering/
+        // 1. Wrap the ObservableList in a FilteredList (initially display all data).
+        FilteredList<Task> filteredTasks = new FilteredList<>(Master.getAllTasks(), p -> true);
+
+        // 2. Set the filter Predicate whenever the filter changes.
+        searchTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            filteredTasks.setPredicate(task -> {
+                // If filter text is empty, display all tasks.
+                if (newValue == null || newValue.isEmpty()) {
+                    return true;
+                }
+        
+                // Compare  name of every task with filter text.
+                String lowerCaseFilter = newValue.toLowerCase();
+                if (task.getName().toLowerCase().contains(lowerCaseFilter)) {
+                    return true; // Filter matches name....
+                } else if(task.getDescription().toLowerCase().contains(lowerCaseFilter)) {
+                    return true;
+                }
+                return false; // Does not match.
+            });
+        });
+
+        // 3. Wrap the FilteredList in a SortedList. 
+        SortedList<Task> sortedTasks = new SortedList<>(filteredTasks);
+
+        // 4. Bind the SortedList comparator to the TableView comparator.
+        sortedTasks.comparatorProperty().bind(taskTableView.comparatorProperty());
+
+        // 5. Add sorted (and filtered) data to the table.
+        taskTableView.setItems(sortedTasks);
+
     }
 
     private void getUserIdFromUsername(String username) {

@@ -1,6 +1,5 @@
 package Model;
 
-import com.mysql.cj.xdevapi.Result;
 import java.util.Optional;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -58,7 +57,7 @@ public class Master {
     public static void deleteAllTasks() {
         allTasks.clear();
     }
-    
+        
     public Optional<ButtonType> showAlert(String title, String header, String content, Alert.AlertType type) {
         Alert alert = new Alert(type);
         alert.setTitle(title);

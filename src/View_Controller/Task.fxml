@@ -105,7 +105,15 @@
                         </VBox>
                         <VBox alignment="CENTER">
                             <children>
-                                <TableView fx:id="taskTableView" minWidth="300.0" onMouseReleased="#tableViewSelectionAction">
+                        <HBox spacing="10.0">
+                           <VBox.margin>
+                              <Insets bottom="5.0" right="5.0" top="5.0" />
+                           </VBox.margin>
+                           <padding>
+                              <Insets bottom="5.0" right="5.0" top="5.0" />
+                           </padding>
+                        </HBox>
+                                <TableView fx:id="taskTableView" minWidth="300.0" onMouseReleased="#tableViewSelectionAction" prefHeight="365.0" prefWidth="411.0">
                                     <columns>
                                         <TableColumn fx:id="taskIdTableColumn" prefWidth="30.0" text="Id" />
                                         <TableColumn fx:id="nameTableColumn" prefWidth="75.0" text="Name" />
@@ -118,15 +126,16 @@
                                         <TableColumn fx:id="usernameTableColumn" prefWidth="75.0" text="Username" />
                                     </columns>
                                 </TableView>
-                                <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                                <HBox alignment="CENTER" spacing="10.0">
                                     <children>
+                              <TextField fx:id="searchTextField" alignment="CENTER" prefWidth="110.0" promptText="Search Tasks" />
                                         <VBox alignment="CENTER">
                                             <children>
                                                 <Label fx:id="sortExportByLabel" text="Sort Export By..." />
-                                                <ChoiceBox fx:id="sortExportByChoiceBox" prefWidth="150.0" />
+                                                <ChoiceBox fx:id="sortExportByChoiceBox" prefWidth="100.0" />
                                             </children>
                                         </VBox>
-                                        <Button fx:id="reportTxtButton" alignment="CENTER_RIGHT" contentDisplay="CENTER" mnemonicParsing="false" onAction="#reportTxtButtonAction" text="Export .txt">
+                                        <Button fx:id="reportTxtButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#reportTxtButtonAction" text="Export .txt">
                                             <HBox.margin>
                                                 <Insets />
                                             </HBox.margin>
@@ -134,7 +143,7 @@
                                         <Button fx:id="reportCsvButton" alignment="CENTER_RIGHT" contentDisplay="CENTER" mnemonicParsing="false" onAction="#reportCsvButtonAction" text="Export .csv" />
                                     </children>
                                     <VBox.margin>
-                                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                        <Insets top="5.0" />
                                     </VBox.margin>
                                 </HBox>
                             </children>
