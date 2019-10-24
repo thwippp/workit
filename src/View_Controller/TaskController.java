@@ -323,11 +323,10 @@ public class TaskController implements Initializable {
                 }
             } else {
                 int uid = Integer.parseInt(userIdTextField.getText().trim());
-
                 try {
                     System.out.println("Starting Insert...");
 
-                    String q = "INSERT INTO task (name, description, dueDate, scope, severity, priority) VALUES (?,?,?,?,?,?,?);";
+                    String q = "INSERT INTO task (name, description, dueDate, scope, severity, priority, userId) VALUES (?,?,?,?,?,?,?);";
                     try (Connection conn = DBConnection.getConnection()) {
                         PreparedStatement ps = conn.prepareStatement(q);
 
@@ -345,7 +344,7 @@ public class TaskController implements Initializable {
 
                 } catch (SQLException ex) {
                     System.out.println(ex);
-                }
+                }    
             }
 
             // Clears intake form
