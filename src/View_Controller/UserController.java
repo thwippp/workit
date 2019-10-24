@@ -307,7 +307,7 @@ public class UserController implements Initializable {
     private void getAIForUser() throws Exception {
         ObservableList<ArrayList> result = null;
         try {
-            String sql = "SELECT auto_increment FROM information_schema.tables WHERE table_name='user'";
+            String sql = "SELECT auto_increment FROM information_schema.tables WHERE table_schema = '" + DBConnection.DB + "' and table_name='user'";
             result = new MYSQL().query(sql);
 
             String uId = result.get(0).get(0).toString();

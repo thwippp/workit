@@ -82,7 +82,7 @@ public class DBConnectionTest {
     }
 
     public Connection dbConnectionVariables(String user, String password) throws SQLException, ClassNotFoundException {
-        String DB = "workit";
+        String DB = "test";
         String IP = "localhost";
         String URL = "jdbc:mysql://" + IP + ":3306/" + DB;
         String USER = user;

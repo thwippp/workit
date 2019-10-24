@@ -87,8 +87,7 @@ public class LoginController implements Initializable {
 
             Boolean isAuthenticated = false;
 
-            try ( // Call "callable function"
-                    Connection conn = DBConnection.getConnection()) {
+            try (Connection conn = DBConnection.getConnection()) {
                 String q = "{call authenticateUser(?,?)}";
                 CallableStatement cs;
                 cs = conn.prepareCall(q);
@@ -99,6 +98,9 @@ public class LoginController implements Initializable {
                 while (rs.next()) {
                     isAuthenticated = rs.getBoolean("IsAuthenticated");
                 }
+            } catch (Exception e) {
+//                Optional<ButtonType> loginException = m.showAlert("Error", "Incorrect Data", "Incorrect Username or Password.  Please try again.", Alert.AlertType.ERROR);
+                System.out.println("Incorrect Username or Password. Please try again.");
             }
 
             // Process results

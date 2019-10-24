@@ -11,11 +11,11 @@ import java.sql.DriverManager;
 public class DBConnection {
 
     // Connection credentials
-    private static final String DB = "workit";
+    public static final String DB = "test"; // workit
     private static final String IP = "localhost";
     private static final String URL = "jdbc:mysql://"+ IP +":3306/" + DB;
-    private static final String USER = "test";  // TODO-- make config file or default user
-    private static final String PASSWORD = "test";
+    private static final String USER = "testa"; // test // TODO-- make config file or default user
+    private static final String PASSWORD = "testa";  // test
     private static final String DRIVER = "com.mysql.cj.jdbc.Driver";
 
     // Connection

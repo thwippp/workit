@@ -706,10 +706,10 @@ public class TaskController implements Initializable {
     private void getAIForTask() throws Exception {
         ObservableList<ArrayList> result = null;
         try {
-            String sql = "SELECT auto_increment FROM information_schema.tables WHERE table_name='task'";
+            String sql = "SELECT auto_increment FROM information_schema.tables WHERE table_schema = '" + DBConnection.DB + "' and table_name='task'";
             result = new MYSQL().query(sql);
 
-            String tId = result.get(0).get(0).toString();
+            String tId = result.get(0).get(0).toString().trim();
             taskIdTextField.setText(tId);
 
             System.out.println(result);
